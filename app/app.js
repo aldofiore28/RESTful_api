@@ -90,7 +90,6 @@ app.route('/tasks')
 app.route('/tasks/:id')
     .put(jsonParser, (req, res) => {
         let id = req.params.id;
-        console.log(id);
         client.connect((err) => {
             if (!err) {
                 const db = client.db(dbname);
