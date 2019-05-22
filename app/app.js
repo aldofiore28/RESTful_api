@@ -49,19 +49,24 @@ app.post('/tasks', jsonParser, (request, response) => {
     })
 });
 
-app.put('/tasks/:id', (request, response) => {
+app.put('/tasks/:id', jsonParser, (request, response) => {
     const id = request.params.id;
+    const input = request.body;
     client.connect((err) => {
         if(!err) {
             const db = client.db(dbname);
             if (id.length === 24) {
-                completeTask(db, objectId(id), (result) => {
-                    if(result.modifiedCount) {
-                        response.json({ success: true, message: 'Task completed!', data: [] });
-                    } else {
-                        response.json({ success: false, message: 'Sorry, something went wrong', data: [] });
-                    }
-                })
+                if (typeof input === 'object' && 'task' in input && 'completed' in input) {
+                    updateTask(db, objectId(id), input, (result) => {
+                        if(result.modifiedCount) {
+                            response.json({ success: true, message: 'Task completed!', data: [] });
+                        } else {
+                            response.json({ success: false, message: 'Task already exists!', data: [] });
+                        }
+                    })
+                } else {
+                    response.json({ success: false, message: 'Not a valid object', data: [] });
+                }
             } else {
                 response.json({ success: false, message: 'The id is not valid', data: [] });
             }
@@ -104,9 +109,9 @@ function  addNewTask(db, input, callback) {
     })
 }
 
-function completeTask(db, id, callback) {
+function updateTask(db, id, input, callback) {
     const collection = db.collection('tasks');
-    collection.updateOne({"_id": id}, {$set: {completed: 1}}, (err, result) => {
+    collection.updateOne({"_id": id}, {$set: input}, (err, result) => {
         callback(result);
     })
 }
