@@ -69,6 +69,26 @@ app.put('/tasks/:id', (request, response) => {
     })
 });
 
+app.delete('/tasks/:id', (request, response) => {
+    const id = request.params.id;
+    client.connect((err) => {
+        if(!err) {
+            const db = client.db(dbname);
+            if (id.length === 24) {
+                removeTask(db, objectId(id), (result) => {
+                    if(result.deletedCount) {
+                        response.json({ success: true, message: 'Task removed from the database', data: [] });
+                    } else {
+                        response.json({ success: false, message: 'Error! Task was not removed!', data: [] });
+                    }
+                })
+            } else {
+                response.json({ success: false, message: 'The id is not valid', data: [] });
+            }
+        }
+    })
+})
+
 
 function getTasks(db, condition, callback) {
     const collection = db.collection('tasks');
@@ -87,6 +107,13 @@ function  addNewTask(db, input, callback) {
 function completeTask(db, id, callback) {
     const collection = db.collection('tasks');
     collection.updateOne({"_id": id}, {$set: {completed: 1}}, (err, result) => {
+        callback(result);
+    })
+}
+
+function removeTask(db, id, callback) {
+    const collection = db.collection('tasks');
+    collection.deleteOne({"_id": id}, (err, result) => {
         callback(result);
     })
 }
