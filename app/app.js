@@ -34,13 +34,17 @@ app.post('/tasks', jsonParser, (request, response) => {
     client.connect((err) => {
         if(!err) {
             const db = client.db(dbname);
-            addNewTask(db, newTask, (result) => {
-                if(result.insertedCount) {
-                    response.json({ success: true, message: 'Task added to the database', data: [] });
-                } else {
-                    response.json({ success: false, message: 'Sorry, something went wrong', data: [] });
-                }
-            })
+            if (typeof newTask === 'object' && newTask.task !== '') {
+                addNewTask(db, newTask, (result) => {
+                    if(result.insertedCount) {
+                        response.json({ success: true, message: 'Task added to the database', data: [] });
+                    } else {
+                        response.json({ success: false, message: 'Sorry, something went wrong', data: [] });
+                    }
+                })
+            } else {
+                response.json({ success: false, message: 'The new task was invalid!', data: []});
+            }
         }
     })
 });
