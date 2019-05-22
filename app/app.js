@@ -73,6 +73,53 @@ app.route('/tasks')
                             };
                             res.json(responseObject);
                         }
+                    } else {
+                        responseObject = {
+                            error: {
+                                statusCode: 500,
+                                message: err
+                            }
+                        }
+                        res.json(responseObject);
+                    }
+                })
+            }
+        })
+    })
+
+app.route('/tasks/:id')
+    .put(jsonParser, (req, res) => {
+        let id = req.params.id;
+        console.log(id);
+        client.connect((err) => {
+            if (!err) {
+                const db = client.db(dbname);
+                db.collection('tasks').updateOne({"_id": objectId(id)}, {$set:{completed: 1}}, (err, result) => {
+                    let responseObject = {};
+                    if (!err) {
+                        if (result.result.ok) {
+                            responseObject = {
+                                statusCode: 204,
+                                message: 'Task successfully updated',
+                                data: []
+                            };
+                            res.json(responseObject);
+                        } else {
+                            responseObject = {
+                                statusCode: 400,
+                                message: 'Task not updated',
+                                data: []
+                            };
+                            res.json(responseObject);
+                        }
+                    }  else {
+                        responseObject = {
+                            error: {
+                                statusCode: 500,
+                                message: err
+                            }
+                        }
+                        res.json(responseObject);
                     }
                 })
             }
