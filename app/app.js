@@ -20,8 +20,31 @@ app.route('/tasks')
             if (!err) {
                 const db = client.db(dbname);
                 db.collection('tasks').find({}).toArray((err, result) => {
+                    let dataResponse = {};
                     if (!err) {
-                        res.json(result);
+                        if (result.length > 0) {
+                            dataResponse = {
+                                statusCode: 200,
+                                message: 'data retrieved',
+                                data: result
+                            };
+                            res.json(dataResponse);
+                        } else {
+                            dataResponse = {
+                                statusCode: 204,
+                                message: 'no data present in the db',
+                                data: []
+                            };
+                            res.json(dataResponse);
+                        }
+                    } else {
+                        dataResponse = {
+                            error: {
+                                statusCode: 500,
+                                message: err
+                            }
+                        }
+                        res.json(dataResponse);
                     }
                 })
             }
@@ -33,9 +56,23 @@ app.route('/tasks')
             if (!err) {
                 const db = client.db(dbname);
                 db.collection('tasks').insertOne(data, (err, result) => {
+                    let responseObject = {};
                     if (!err) {
-                        // change this to return a certain data in a certain way
-                        res.json(result);
+                        if(result.result.ok) {
+                            responseObject = {
+                                statusCode: 201,
+                                message: 'Task added to the database',
+                                data: []
+                            };
+                            res.json(responseObject);
+                        } else {
+                            responseObject = {
+                                statusCode: 400,
+                                message: 'Database error, task not added to the database',
+                                data: []
+                            };
+                            res.json(responseObject);
+                        }
                     }
                 })
             }
