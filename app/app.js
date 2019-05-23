@@ -102,7 +102,7 @@ function getTasks(db, condition, callback) {
     })
 }
 
-function  addNewTask(db, input, callback) {
+function addNewTask(db, input, callback) {
     const collection = db.collection('tasks');
     collection.insertOne(input, (err, result) => {
         callback(result);
