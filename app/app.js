@@ -102,28 +102,28 @@ app.delete('/tasks/:id', (request, response) => {
 })
 
 
-function getTasks(db, condition, callback) {
+const getTasks = (db, condition, callback) => {
     const collection = db.collection('tasks');
     collection.find(condition).toArray((err, result) => {
         callback(result);
     })
 }
 
-function addNewTask(db, input, callback) {
+const addNewTask = (db, input, callback) => {
     const collection = db.collection('tasks');
     collection.insertOne(input, (err, result) => {
         callback(result);
     })
 }
 
-function updateTask(db, id, input, callback) {
+const updateTask = (db, id, input, callback) => {
     const collection = db.collection('tasks');
     collection.updateOne({"_id": id}, {$set: input}, (err, result) => {
         callback(result);
     })
 }
 
-function removeTask(db, id, callback) {
+const removeTask = (db, id, callback) => {
     const collection = db.collection('tasks');
     collection.deleteOne({"_id": id}, (err, result) => {
         callback(result);
